@@ -19,6 +19,9 @@ import { winstonConfig } from '@lib/shared/logger/logger.config';
           consumer: {
             groupId: 'nestjs-kafka-group', // Unique group ID
           },
+          producer: {
+            allowAutoTopicCreation: true,
+          },
         },
       },
     ]),

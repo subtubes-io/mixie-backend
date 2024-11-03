@@ -4,10 +4,7 @@
   "type": "object",
   "properties": {
     "text": { "type": "string" },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time"
-    }
+    "timestamp": { "type": "string" }
   },
   "required": ["text", "timestamp"]
 }
