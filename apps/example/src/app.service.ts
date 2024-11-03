@@ -47,7 +47,7 @@ export class AppService implements OnModuleInit {
       timestamp: new Date().toISOString(),
     };
 
-    this.logger.log('Message payload:', messagePayload);
+    // this.logger.log('Message payload:', messagePayload);
 
     try {
       // Validate and encode the message using the JSON schema
@@ -61,7 +61,10 @@ export class AppService implements OnModuleInit {
         .emit('message_created', encodedMessage)
         .toPromise();
 
-      this.logger.log('Message sent to Kafka', { text: createMessageDto.text });
+      this.logger.log(
+        JSON.stringify({ text: createMessageDto.text }),
+        'Message sent to Kafka',
+      );
     } catch (error) {
       this.logger.error('Failed to encode or send message', error.message);
       throw error;

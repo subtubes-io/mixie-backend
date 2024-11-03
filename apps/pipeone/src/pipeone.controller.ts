@@ -44,12 +44,15 @@ export class PipeoneController implements OnModuleInit {
 
   @EventPattern('message_created')
   async handleMessage(@Payload() message: any) {
-    this.logger.log('Received message:', message);
+    this.logger.log(message, 'Received message in Controller:');
 
     try {
       // Decode and validate the message using the JSON schema
       const decodedMessage = await this.registry.decode(message);
-      this.logger.log('Received decoded message:', decodedMessage);
+      this.logger.log(
+        JSON.stringify(decodedMessage),
+        'Received decoded message:',
+      );
 
       // Process the decoded message as needed
     } catch (error) {

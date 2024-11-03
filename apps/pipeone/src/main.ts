@@ -9,12 +9,13 @@ async function bootstrap() {
     PipeoneModule,
     {
       logger: WinstonModule.createLogger(winstonConfig),
-      transport: Transport.RMQ,
+      transport: Transport.KAFKA,
       options: {
-        urls: ['amqp://guest:guest@localhost:5672'], // RabbitMQ URL
-        queue: 'messages_queue', // The queue to listen on
-        queueOptions: {
-          durable: false,
+        client: {
+          brokers: ['localhost:9092'], // Kafka broker URL
+        },
+        consumer: {
+          groupId: 'nestjs-kafka-group', // Unique consumer group ID
         },
       },
     },
