@@ -19,8 +19,9 @@ export class AppService implements OnModuleInit {
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {
+    // Update the Schema Registry URL to the Redpanda Schema Registry endpoint
     this.registry = new SchemaRegistry({
-      host: 'http://localhost:8888/apis/ccompat/v6',
+      host: 'http://localhost:8081', // Assuming Redpanda Schema Registry is exposed on this port
     });
   }
 

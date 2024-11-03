@@ -12,7 +12,7 @@ export class PipeoneController {
     private readonly logger: LoggerService,
   ) {
     this.registry = new SchemaRegistry({
-      host: 'http://localhost:8888/apis/ccompat/v6',
+      host: 'http://localhost:8081',
     });
   }
 
