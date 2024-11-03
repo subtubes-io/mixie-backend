@@ -1,0 +1,9 @@
+{
+  "type": "record",
+  "name": "MessageEvent",
+  "namespace": "com.example.events",
+  "fields": [
+    { "name": "text", "type": "string" },
+    { "name": "timestamp", "type": "string" }
+  ]
+}
