@@ -1,3 +1,13 @@
 {
-  "schema": "{\"type\":\"record\",\"name\":\"MessageEvent\",\"fields\":[{\"name\":\"text\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]}"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "com.example.events.MessageEventJson",
+  "type": "object",
+  "properties": {
+    "text": { "type": "string" },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["text", "timestamp"]
 }

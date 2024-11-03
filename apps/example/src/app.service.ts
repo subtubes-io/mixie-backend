@@ -7,7 +7,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateMessageDto } from '@lib/shared/dto/create-message.dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { SchemaRegistry } from '@kafkajs/confluent-schema-registry';
+import { SchemaRegistry, SchemaType } from '@kafkajs/confluent-schema-registry';
 
 @Injectable()
 export class AppService implements OnModuleInit {
@@ -19,16 +19,18 @@ export class AppService implements OnModuleInit {
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {
-    // Update the Schema Registry URL to the Redpanda Schema Registry endpoint
-    this.registry = new SchemaRegistry({
-      host: 'http://localhost:8081', // Assuming Redpanda Schema Registry is exposed on this port
-    });
+    // Initialize the Schema Registry with JSON schema support
+    this.registry = new SchemaRegistry(
+      { host: 'http://localhost:8081' },
+      { [SchemaType.JSON]: { strict: true } },
+    );
   }
 
   async onModuleInit() {
     try {
-      // Correctly assign the schema ID
-      this.schemaId = await this.registry.getLatestSchemaId('MessageEvent');
+      // Fetch the latest schema ID for 'MessageEvent'
+      const id = await this.registry.getLatestSchemaId('MessageEvent');
+      this.schemaId = id;
       this.logger.log(`Fetched schema ID: ${this.schemaId}`);
     } catch (error) {
       this.logger.error('Failed to fetch schema from registry', error);
@@ -42,12 +44,22 @@ export class AppService implements OnModuleInit {
       timestamp: new Date().toISOString(),
     };
 
-    // Serialize the message using the schema from the registry
-    const buffer = await this.registry.encode(this.schemaId, messagePayload);
+    this.logger.log('Message payload:', messagePayload);
 
-    // Send the message
-    this.client.emit('message_created', buffer);
+    try {
+      // Validate and encode the message using the JSON schema
+      const encodedMessage = await this.registry.encode(
+        this.schemaId,
+        messagePayload,
+      );
 
-    this.logger.log('Message sent', { text: createMessageDto.text });
+      // Send the message
+      this.client.emit('message_created', encodedMessage);
+
+      this.logger.log('Message sent', { text: createMessageDto.text });
+    } catch (error) {
+      this.logger.error('Failed to encode message', error.message);
+      throw error;
+    }
   }
 }

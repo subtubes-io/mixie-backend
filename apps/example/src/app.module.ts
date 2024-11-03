@@ -13,7 +13,7 @@ import { winstonConfig } from '@lib/shared/logger/logger.config';
         name: 'MESSAGE_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: [process.env.RABBITMQ_URL], // RabbitMQ URL
+          urls: ['amqp://guest:guest@localhost:5672'], // RabbitMQ URL
           queue: 'messages_queue', // The queue to communicate with
           queueOptions: {
             durable: false,
