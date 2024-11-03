@@ -10,13 +10,14 @@ import { winstonConfig } from '@lib/shared/logger/logger.config';
     WinstonModule.forRoot(winstonConfig),
     ClientsModule.register([
       {
-        name: 'MESSAGE_SERVICE',
-        transport: Transport.RMQ,
+        name: 'KAFKA_SERVICE',
+        transport: Transport.KAFKA,
         options: {
-          urls: ['amqp://guest:guest@localhost:5672'], // RabbitMQ URL
-          queue: 'messages_queue', // The queue to communicate with
-          queueOptions: {
-            durable: false,
+          client: {
+            brokers: ['localhost:9092'], // Kafka broker URL
+          },
+          consumer: {
+            groupId: 'nestjs-kafka-group', // Unique group ID
           },
         },
       },

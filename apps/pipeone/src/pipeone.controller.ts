@@ -28,7 +28,7 @@ export class PipeoneController implements OnModuleInit {
   async onModuleInit() {
     try {
       // Fetch and cache the latest schema
-      const id = await this.registry.getLatestSchemaId('MessageEvent');
+      const id = await this.registry.getLatestSchemaId('MessageEventJson');
       const schema = await await this.registry.getSchema(id);
       this.schemaId = id;
       this.schema = schema;

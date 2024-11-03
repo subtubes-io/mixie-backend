@@ -4,7 +4,7 @@ import {
   LoggerService,
   OnModuleInit,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientKafka } from '@nestjs/microservices';
 import { CreateMessageDto } from '@lib/shared/dto/create-message.dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { SchemaRegistry, SchemaType } from '@kafkajs/confluent-schema-registry';
@@ -15,7 +15,7 @@ export class AppService implements OnModuleInit {
   private schemaId: number;
 
   constructor(
-    @Inject('MESSAGE_SERVICE') private readonly client: ClientProxy,
+    @Inject('KAFKA_SERVICE') private readonly kafkaClient: ClientKafka,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {
@@ -28,8 +28,11 @@ export class AppService implements OnModuleInit {
 
   async onModuleInit() {
     try {
+      // Connect to Kafka and ensure the client is ready to emit messages
+      await this.kafkaClient.connect();
+
       // Fetch the latest schema ID for 'MessageEvent'
-      const id = await this.registry.getLatestSchemaId('MessageEvent');
+      const id = await this.registry.getLatestSchemaId('MessageEventJson');
       this.schemaId = id;
       this.logger.log(`Fetched schema ID: ${this.schemaId}`);
     } catch (error) {
@@ -53,12 +56,14 @@ export class AppService implements OnModuleInit {
         messagePayload,
       );
 
-      // Send the message
-      this.client.emit('message_created', encodedMessage);
+      // Send the encoded message to Kafka topic 'message_created' and await it
+      await this.kafkaClient
+        .emit('message_created', encodedMessage)
+        .toPromise();
 
-      this.logger.log('Message sent', { text: createMessageDto.text });
+      this.logger.log('Message sent to Kafka', { text: createMessageDto.text });
     } catch (error) {
-      this.logger.error('Failed to encode message', error.message);
+      this.logger.error('Failed to encode or send message', error.message);
       throw error;
     }
   }

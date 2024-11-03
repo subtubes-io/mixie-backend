@@ -14,7 +14,14 @@ export class AppController {
   @Post()
   async sendMessage(@Body() createMessageDto: CreateMessageDto) {
     this.logger.log('Received message', { text: createMessageDto.text });
-    await this.appService.sendMessage(createMessageDto);
-    return { status: 'Message sent' };
+
+    try {
+      // Send the message to Kafka
+      await this.appService.sendMessage(createMessageDto);
+      return { status: 'Message sent to Kafka' };
+    } catch (error) {
+      this.logger.error('Error sending message to Kafka', error.message);
+      throw new Error('Failed to send message to Kafka');
+    }
   }
 }
