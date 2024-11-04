@@ -16,8 +16,11 @@ function main {
     case $1 in
 
     "up")
+        mkdir -p ./.vols/postgres
+        mkdir -p ./.vols/kafka
         npm ci
         docker compose up -d
+        wait 20
         register
         npm run start:dev
         ;;

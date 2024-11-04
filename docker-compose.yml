@@ -1,29 +1,19 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: mixietape-postgres
+    container_name: mixie-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mixietape
+      POSTGRES_DB: mixie
     ports:
       - '5432:5432'
     volumes:
-      - ~/docker/postgres/mixietape-postgres:/var/lib/postgresql/data # Mount a persistent volume for data
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: mixietape-rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    ports:
-      - '5672:5672' # Port for RabbitMQ connections
-      - '15672:15672' # Port for RabbitMQ management UI
+      - ./.vols/postgres:/var/lib/postgresql/data # Mount a persistent volume for data
 
   kafka-1:
     image: bitnami/kafka:latest
-    container_name: mixietape-kafka
+    container_name: mixie-kafka
     ports:
       - '9092:9092' # Expose port 9092 to the host
     environment:
@@ -37,11 +27,11 @@ services:
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     volumes:
-      - ~/docker/kafka/mixietape:/bitnami/kafka
+      - ./.vols/kafka:/bitnami/kafka
 
   redpanda:
     image: docker.vectorized.io/vectorized/redpanda:latest
-    container_name: mixietape-redpanda
+    container_name: mixie-redpanda
     environment:
       - REDPANDA_AUTO_CREATE_TOPICS=true
       - REDPANDA_DEVELOPER_MODE=true
