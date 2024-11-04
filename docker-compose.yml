@@ -4,6 +4,11 @@ services:
     image: docker.io/bitnami/kafka:3.8
     container_name: mixie-kafka-0
     hostname: kafka-0
+    healthcheck:
+      test: ['CMD', 'nc', '-z', 'localhost', '19092']
+      interval: 10s
+      timeout: 5s
+      retries: 12
     ports:
       - '9092:9092' # Host port 9092 -> Broker 0's client port
     environment:
@@ -32,6 +37,11 @@ services:
     image: docker.io/bitnami/kafka:3.8
     container_name: mixie-kafka-1
     hostname: kafka-1
+    healthcheck:
+      test: ['CMD', 'nc', '-z', 'localhost', '19092']
+      interval: 10s
+      timeout: 5s
+      retries: 12
     ports:
       - '9093:9092' # Host port 9093 -> Broker 1's client port
     environment:
@@ -56,6 +66,22 @@ services:
     volumes:
       - 'kafka1_data:/bitnami/kafka'
 
+  schema-registry:
+    image: docker.io/bitnami/schema-registry:7.7
+    container_name: mixie-kafka-registry
+    ports:
+      - '8081:8081'
+    depends_on:
+      kafka-0:
+        condition: service_healthy
+      kafka-1:
+        condition: service_healthy
+    environment:
+      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:8081
+      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://kafka-0:19092,PLAINTEXT://kafka-1:19092
+    networks:
+      - kafka-net
+
   # schema-registry:
   #   image: docker.io/bitnami/schema-registry:7.7
   #   container_name: mixie-kafka-registry
@@ -70,16 +96,16 @@ services:
   #   networks:
   #     - kafka-net
 
-  redpanda:
-    image: docker.vectorized.io/vectorized/redpanda:latest
-    container_name: mixie-redpanda
-    environment:
-      - REDPANDA_AUTO_CREATE_TOPICS=true
-      - REDPANDA_DEVELOPER_MODE=true
-    ports:
-      - '8081:8081' # Schema Registry port
-    command:
-      - redpanda start --schema-registry-addr 0.0.0.0:8081
+  # redpanda:
+  #   image: docker.vectorized.io/vectorized/redpanda:latest
+  #   container_name: mixie-redpanda
+  #   environment:
+  #     - REDPANDA_AUTO_CREATE_TOPICS=true
+  #     - REDPANDA_DEVELOPER_MODE=true
+  #   ports:
+  #     - '8081:8081' # Schema Registry port
+  #   command:
+  #     - redpanda start --schema-registry-addr 0.0.0.0:8081
 
   postgres:
     image: postgres:16-alpine
