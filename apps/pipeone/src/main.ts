@@ -12,7 +12,7 @@ async function bootstrap() {
       transport: Transport.KAFKA,
       options: {
         client: {
-          brokers: ['localhost:9092'], // Kafka broker URL
+          brokers: ['localhost:9092', 'localhost:9093'], // Kafka broker URL
         },
         consumer: {
           groupId: 'nestjs-kafka-group', // Unique consumer group ID
