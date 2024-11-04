@@ -2,8 +2,6 @@ services:
   kafka-0:
     image: docker.io/bitnami/kafka:3.8
     container_name: mixie-kafak-0
-    ports:
-      - '9092:9092' # Expose port 9092 to the host
     environment:
       # KRaft settings
       - KAFKA_CFG_NODE_ID=0
@@ -21,6 +19,8 @@ services:
 
   kafka-1:
     image: docker.io/bitnami/kafka:3.8
+    ports:
+      - '9092:9092' # Expose port 9092 to the host
     container_name: mixie-kafka-1
     environment:
       # KRaft settings
