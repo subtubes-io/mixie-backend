@@ -5,15 +5,29 @@
 #     -H "Content-Type: application/vnd.schemaregistry.v1+json" \
 #     -d '{"schema": "{\"type\": \"record\", \"name\": \"MessageEvent\", \"namespace\": \"com.example.events\", \"fields\": [{\"name\": \"text\", \"type\": \"string\"}, {\"name\": \"timestamp\", \"type\": \"string\"}]}", "schemaType": "AVRO"}'
 
+function register {
+    if curl -X POST http://localhost:8081/subjects/MessageEventJson/versions \
+        -H "Content-Type: application/vnd.schemaregistry.v1+json" \
+        -d '{"schemaType":"JSON","schema":'"$(jq -Rs . <schemas/message.json)"'}'; then
+        echo "Schema registered successfully."
+    else
+        echo "Failed to register schema." >&2
+        exit 1
+    fi
+}
+
 function main {
 
     case $1 in
 
+    "up")
+        npm ci
+        docker compose up -d
+        register
+        npm run start:dev
+        ;;
     "register")
-        curl -X POST http://localhost:8081/subjects/MessageEventJson/versions \
-            -H "Content-Type: application/vnd.schemaregistry.v1+json" \
-            -d '{"schemaType":"JSON","schema":'"$(jq -Rs . <schemas/message.json)"'}'
-
+        register
         ;;
     "message")
         curl -X POST "http://localhost:3000/" -H "Content-Type: application/json" \
@@ -22,7 +36,7 @@ function main {
         ;;
     "load-test")
         # Set the number of threads from the second argument, or default to 100 if not provided
-        max_threads=${2:-100}
+        max_threads=${2:-10}
         current_threads=0
 
         echo "Starting load test with $max_threads threads."
