@@ -16,11 +16,17 @@ function main {
     case $1 in
 
     "up")
-        mkdir -p ./.vols/postgres
-        mkdir -p ./.vols/kafka
         npm ci
         docker compose up -d
-        wait 20
+        echo "Waiting for Schema Registry to be ready on localhost:8081..."
+
+        # Loop until the service is available
+        until $(curl --output /dev/null --silent --head --fail http://localhost:8081); do
+            printf '.'
+            sleep 1
+        done
+
+        echo "Schema Registry is up!"
         register
         npm run start:dev
         ;;
