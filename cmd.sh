@@ -16,7 +16,8 @@ function main {
     case $1 in
 
     "up")
-        # npm ci
+        npm ci
+        docker compose build
         docker compose up -d
         echo "Waiting for Schema Registry to be ready on localhost:8081..."
 
@@ -28,7 +29,7 @@ function main {
 
         echo "Schema Registry is up!"
         register
-        npm run start:dev
+        # npm run start:dev
         ;;
     "register")
         register
