@@ -21,7 +21,7 @@ export class AppService implements OnModuleInit {
   ) {
     // Initialize the Schema Registry with JSON schema support
     this.registry = new SchemaRegistry(
-      { host: 'http://localhost:8081' },
+      { host: 'http://schema-registry:8081' },
       { [SchemaType.JSON]: { strict: true } },
     );
   }

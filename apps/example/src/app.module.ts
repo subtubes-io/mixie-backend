@@ -14,7 +14,7 @@ import { winstonConfig } from '@lib/shared/logger/logger.config';
         transport: Transport.KAFKA,
         options: {
           client: {
-            brokers: ['localhost:9092', 'localhost:9093'], // Kafka broker URL
+            brokers: ['kafka-0:9092', 'kafka-1:9093'], // Kafka broker URL
           },
           consumer: {
             groupId: 'nestjs-kafka-group', // Unique group ID

@@ -1,0 +1,31 @@
+# Stage 1: Build the NestJS app
+FROM node:20-alpine as builder
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the package files and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the app source code
+COPY . .
+
+# Build the app
+RUN npm run build
+
+# Stage 2: Run the NestJS app
+FROM node:20-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy only the build artifacts and node_modules from the builder stage
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+
+# Expose the application port (adjust if necessary)
+# EXPOSE 3000
+
+# Start the app
+CMD ["npm", "run", "start:dev:pipeone"]
