@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 function register {
+
+    until $(curl --output /dev/null --silent --head --fail http://localhost:8081); do
+        printf '.'
+        sleep 1
+    done
+
     if curl -X POST http://localhost:8081/subjects/MessageEventJson/versions \
         -H "Content-Type: application/vnd.schemaregistry.v1+json" \
         -d '{"schemaType":"JSON","schema":'"$(jq -Rs . <schemas/message.json)"'}'; then
